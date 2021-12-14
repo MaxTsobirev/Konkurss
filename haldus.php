@@ -1,10 +1,22 @@
 <?php
+session_start();
+if(!isset($_SESSION['tuvastamine'])) {
+    header('Location: login.php');
+    exit();
+}
 require_once ('conf.php');
 global $yhendus;
 // punktide lisamine UPDATE
 if (isset($_REQUEST['punkt'])){
     $kask=$yhendus->prepare("UPDATE konkurss SET punktid=0 WHERE id=?");
     $kask->bind_param("i",$_REQUEST['punkt']);
+    $kask->execute();
+    header("Location: $_SERVER[PHP_SELF]");
+}
+// kommentaar lisamine UPDATE
+if (isset($_REQUEST['kommentaar'])){
+    $kask=$yhendus->prepare("UPDATE konkurss SET kommentaar=0 WHERE id=?");
+    $kask->bind_param("i",$_REQUEST['kommentaar']);
     $kask->execute();
     header("Location: $_SERVER[PHP_SELF]");
 }
@@ -45,8 +57,10 @@ if (isset($_REQUEST['kustuta'])){
 </head>
 <body>
 <nav>
+    <a href="lisamine.php">Lisamine</a>
     <a href="haldus.php">Admin leht</a>
     <a href="konkurss.php">Kasutaja leht</a>
+    <a href="https://github.com/MaxTsobirev/Konkurss">GITHUB</a>
 </nav>
 <h1>FotoKonkurssi halduseleht</h1>
 <?php
@@ -62,6 +76,7 @@ while($kask->fetch()){
     echo "<td>$aeg</td>";
     echo "<td>$punktid</td>";
     echo "<td><a href='?punkt=$id'>Punktid nulliks</a></td>";
+    echo "<td><a href='?kommentaar=$id'>Kommentaar nulliks</a></td>";
     //Peida-näita
     $avatekst="Ava";
     $param="avamine";
@@ -81,18 +96,6 @@ while($kask->fetch()){
 echo "</table>"
 
 ?>
-<h2>Uue pilti lisamine konkurssi</h2>
-<form action="?">
-    <input type="text" name="nimi" placeholder="uus nimi">
-    <br>
-    <textarea name="pilt">pildi linki aadress</textarea>
-    <br>
-    <input type="submit" value="Lisa">
-</form>
-<br>
-<br>
-<br>
-<br>
-<br>
+
 </body>
 </html>
